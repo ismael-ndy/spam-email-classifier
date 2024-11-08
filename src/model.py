@@ -57,6 +57,11 @@ def save_model_to_pkl(model, name: str):
 
 # Train the passed model and save it in a pickle file for later use
 def train_and_save_model(model, X_train, y_train, X_test, y_test):
+    '''
+    model: An instance of a model should be passed.
+    For example: LogisticRegression() or RandomForestClassifier()
+    '''
+    
     model_name = type(model).__name__
 
     # Train the model
@@ -132,11 +137,11 @@ def main():
     
     
     # Train the model, save it, and check its performance
-    model2 = RandomForestClassifier(random_state=42)
-    model1 = LogisticRegression(random_state=42, max_iter=1000)
+    rfc_model = RandomForestClassifier(random_state=42)
+    lr_model = LogisticRegression(random_state=42, max_iter=1000)
     
-    train_and_save_model(model1, X_train_features, y_train, X_test_features, y_test)
-    train_and_save_model(model2, X_train_features, y_train, X_test_features, y_test)
+    train_and_save_model(rfc_model, X_train_features, y_train, X_test_features, y_test)
+    train_and_save_model(lr_model, X_train_features, y_train, X_test_features, y_test)
 
 
 
