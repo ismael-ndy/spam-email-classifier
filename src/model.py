@@ -88,7 +88,7 @@ def train_and_save_model(model, X_train, y_train, X_test, y_test):
     print(f"Precision: {precision}")
     print(f"Recall: {recall}")
     print(f"F1: {f1}")
-        
+     
 
 
 def main():
@@ -99,7 +99,7 @@ def main():
     dataset["spam_word_count"] = dataset["text_combined"].apply(lambda x: sum(x.lower().count(word) for word in SPAM_WORDS))
     # TODO : Add more features ?
 
-    
+
     # Encoding the label to numerical values
     encoder = LabelEncoder()
     y = encoder.fit_transform(dataset["label"])
@@ -132,7 +132,7 @@ def main():
     # Combine TF-IDF and additional features for both training and test sets
     X_train_features = hstack([X_train_tfidf, X_train_additional_sparse])
     X_test_features = hstack([X_test_tfidf, X_test_additional_sparse])
-    
+
     print("[+] - Finished processing the features.")
     
     

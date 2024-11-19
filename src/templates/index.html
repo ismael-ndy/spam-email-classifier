@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Spam AI</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+    <style>
+        body {
+            background-color: #f8f9fa;
+            font-family: Arial, sans-serif;
+        }
+
+        h1 {
+            font-size: 2.8rem;
+            color: #6C584C;
+            font-weight: bold;
+        }
+
+        p {
+            font-size: 1.4rem;
+            color: #A98467;
+            font-weight: bold;
+        }
+
+        .btn-model {
+            background-color: #E3D5CA;
+            border: none;
+            padding: 15px 25px;
+            border-radius: 8px;
+            cursor: pointer;
+            color: black;
+            font-weight: bold;
+            margin: 10px;
+        }
+
+        .btn-model:hover {
+            background-color: #d1c2b2;
+        }
+
+        .btn-model.selected {
+            background-color: #6C584C;
+            color: white;
+        }
+
+        .btn-detect {
+            background-color: #E3D5CA;
+            border: none;
+            padding: 15px 35px;
+            border-radius: 8px;
+            color: black;
+            font-weight: bold;
+            margin-top: 20px;
+        }
+
+        .btn-detect:hover {
+            background-color: #d1c2b2;
+        }
+
+        textarea {
+            width: 100%;
+            height: 200px;
+            border-radius: 8px;
+            border: 1px solid #ccc;
+            padding: 15px;
+            margin-bottom: 20px;
+        }
+
+        .spinner-border {
+            display: none;
+        }
+
+        .result-container {
+            margin-top: 30px;
+            text-align: left;
+        }
+
+        .suggested-response-title {
+            font-size: 1.5rem;
+            color: #6C584C;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+
+        .suggested-response {
+            font-size: 1.1rem;
+            color: #333;
+            line-height: 1.6;
+        }
+    </style>
+</head>
+<body>
+    <div class="container text-center">
+        <h1 class="mb-4">Spam AI</h1>
+        <p class="mb-5">Use the power of AI to detect spam emails accurately</p>
+
+        <!-- Email Input -->
+        <textarea id="emailInput" placeholder="Enter the email here..."></textarea>
+
+        <!-- Model Selection Buttons -->
+        <div class="d-flex justify-content-center mt-3">
+            <button id="logisticBtn" class="btn-model" onclick="selectModel('LogisticRegression')">Logistic Regression</button>
+            <button id="randomForestBtn" class="btn-model" onclick="selectModel('RandomForestClassifier')">Random Forest</button>
+        </div>
+
+        <!-- Detect Button -->
+        <button class="btn-detect mt-4" onclick="handleDetect()">Detect!</button>
+
+        <!-- Spinner for Loading -->
+        <div class="spinner-border text-primary mt-4" id="loadingSpinner" role="status">
+            <span class="visually-hidden">Loading...</span>
+        </div>
+
+        <!-- Result Display -->
+        <div id="result" class="result-container mt-5"></div>
+    </div>
+
+    <script>
+        let selectedModel = null; // Track selected model
+
+        // Function to handle model selection
+        function selectModel(model) {
+            selectedModel = model;
+
+            // Update button states
+            document.getElementById('logisticBtn').classList.remove('selected');
+            document.getElementById('randomForestBtn').classList.remove('selected');
+
+            if (model === 'LogisticRegression') {
+                document.getElementById('logisticBtn').classList.add('selected');
+            } else if (model === 'RandomForestClassifier') {
+                document.getElementById('randomForestBtn').classList.add('selected');
+            }
+        }
+
+        // Function to handle detection
+        async function handleDetect() {
+            const email = document.getElementById('emailInput').value;
+            const resultDiv = document.getElementById('result');
+            const spinner = document.getElementById('loadingSpinner');
+
+            // Clear previous results and show spinner
+            resultDiv.innerHTML = '';
+            spinner.style.display = 'inline-block';
+
+            if (!selectedModel) {
+                spinner.style.display = 'none';
+                resultDiv.innerHTML = '<div class="alert alert-danger">Please select a model!</div>';
+                return;
+            }
+
+            if (!email.trim()) {
+                spinner.style.display = 'none';
+                resultDiv.innerHTML = '<div class="alert alert-danger">Please enter an email!</div>';
+                return;
+            }
+
+            // Send POST request to the backend
+            try {
+                const response = await fetch('/predict', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/x-www-form-urlencoded',
+                    },
+                    body: new URLSearchParams({
+                        email: email,
+                        model: selectedModel
+                    })
+                });
+
+                const data = await response.json();
+                spinner.style.display = 'none';
+
+                // Handle the result
+                if (data.result === 'spam') {
+                    resultDiv.innerHTML = '<div class="alert alert-danger">This email is spam!</div>';
+                } else if (data.result === 'not spam') {
+                    resultDiv.innerHTML = `
+                        <div class="alert alert-success">This email is not spam!</div>
+                        <div class="suggested-response-title">Suggested Response:</div>
+                        <div class="suggested-response">${data.response.replace(/\n/g, '<br>')}</div>
+                    `;
+                } else {
+                    resultDiv.innerHTML = `<div class="alert alert-warning">Unexpected result: ${data.error}</div>`;
+                }
+            } catch (error) {
+                spinner.style.display = 'none';
+                resultDiv.innerHTML = `<div class="alert alert-danger">Error: ${error.message}</div>`;
+            }
+        }
+    </script>
+</body>
+</html>
