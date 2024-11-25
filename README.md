@@ -36,7 +36,7 @@ The dataset used is a combination of various sources of labeled emails[^1].
 It is stored in five separate CSV files in `./src/Dataset/`. These files are concatenated into a single DataFrame for processing. Each file should contain the following columns. 
 
 - `text_combined`: The email text to classify.
-- `label`: The label for each email (e.g., `spam` or `not spam`).
+- `label`: The label for each email (e.g., `1: spam` or `0: not spam`).
 
 
 ## Training the Models
