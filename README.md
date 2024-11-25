@@ -1,6 +1,6 @@
 # Spam Email Classifier
 
-This project provides a **Spam Email Classifier** using `Logistic Regression` and `Random Forest` models. The classifier leverages **TF-IDF vectorization** and **feature engineering** based on common spam words to detect potentially malicious or spam emails.
+This project provides a **Spam Email Classifier** using `Logistic Regression` and `Random Forest` models. The classifier leverages **TF-IDF vectorization** and **feature engineering** based on common spam words to detect potentially malicious or spam emails. Additionally, it includes a web application built with Flask that detects if the input email is spam and, if it is not, uses a self-hosted Llama 3.2 model with Ollama to generate a suggested response.
 
 ## Table of Contents
 
@@ -10,6 +10,8 @@ This project provides a **Spam Email Classifier** using `Logistic Regression` an
 - [Training the Models](#training-the-models)
 - [Evaluation Metrics](#evaluation-metrics)
 - [Saving the Models](#saving-the-models)
+- [Web Application](#web-application)
+- [Setup Instructions](#setup-instructions)
 - [Future Improvements](#future-improvements)
 
 ---
@@ -21,6 +23,7 @@ The project consists of:
 2. **Model Training**: Trains both Logistic Regression and Random Forest models on the preprocessed data.
 3. **Model Persistence**: Saves the trained models and TF-IDF vectorizer for future predictions.
 4. **Evaluation**: Provides accuracy, precision, recall, and F1-score metrics.
+5. **Web Application**: A Flask web app that allows users to input an email, detect if it is spam, and generate a suggested response if it is not spam.
 
 ## Features
 
@@ -29,20 +32,20 @@ The project consists of:
 - **Model Training**: Uses Logistic Regression and Random Forest models to classify emails.
 - **Model Evaluation**: Calculates and displays performance metrics like accuracy, precision, recall, and F1-score.
 - **Model Saving**: Saves the trained models and vectorizer for deployment in a web app.
+- **Web Application**: Provides a user interface to input emails, select a model, and get spam detection results along with suggested responses for non-spam emails.
 
 ## Dataset
 
 The dataset used is a combination of various sources of labeled emails[^1].
-It is stored in five separate CSV files in `./src/Dataset/`. These files are concatenated into a single DataFrame for processing. Each file should contain the following columns. 
+It is stored in five separate CSV files in `./src/Dataset/`. These files are concatenated into a single DataFrame for processing. Each file should contain the following columns:
 
 - `text_combined`: The email text to classify.
 - `label`: The label for each email (e.g., `spam` or `not spam`).
 
-
 ## Training the Models
 
-The script `main.py`:
-1. Loads and concatenates the dataset files.
+The script `src/model.py`:
+1. Loads and concatenates the dataset files using the [`get_dataset`](src/model.py) function.
 2. Encodes labels using `LabelEncoder`.
 3. Splits the dataset into training and testing sets.
 4. Applies TF-IDF vectorization with unigram and bigram features.
@@ -62,6 +65,55 @@ The metrics are displayed in the console after training.
 ## Saving the Models
 
 The trained models and TF-IDF vectorizer are saved to `./src/trained_models/`. The vectorizer file (`tfidf_model.pkl`) and each model file (e.g., `LogisticRegression_model.pkl`, `RandomForestClassifier_model.pkl`) are stored in this directory.
+
+## Web Application
+
+The web application is built using Flask and provides the following features:
+- **Email Input**: Users can input the email text they want to classify.
+- **Model Selection**: Users can select between Logistic Regression and Random Forest models.
+- **Spam Detection**: The app detects if the input email is spam.
+- **Suggested Response**: If the email is not spam, the app uses a self-hosted Llama 3.2 model with Ollama to generate a suggested response.
+
+## Setup Instructions
+
+1. **Clone the repository**:
+    ```sh
+    git clone <repository-url>
+    cd <repository-directory>
+    ```
+
+2. **Create a virtual environment**:
+    ```sh
+    python -m venv venv
+    source venv/bin/activate  # On Windows, use `venv\Scripts\activate`
+    ```
+
+3. **Install the required packages**:
+    ```sh
+    pip install -r requirements.txt
+    ```
+
+4. **Download the dataset**:
+    Place the dataset CSV files in the `./src/Dataset/` directory.
+
+5. **Train the models**:
+    Run the `src/model.py` script to train and save the models.
+    ```sh
+    python src/model.py
+    ```
+
+6. **Set up the Flask web application**:
+    ```sh
+    export FLASK_APP=src/app.py
+    export FLASK_ENV=development  # For development environment
+    flask run
+    ```
+
+7. **Set up the self-hosted Llama 3.2 with Ollama**:
+    Follow the instructions provided by Ollama to set up the self-hosted Llama 3.2 model.
+
+8. **Access the web application**:
+    Open your web browser and go to `http://localhost:5000`.
 
 ## Future Improvements
 
